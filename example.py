@@ -14,32 +14,35 @@ class MyListener(Listener):
         # Finally, call the Super Class initialiser.
         super().__init__(q)
 
+    def now(self):
+        return time.strftime("%d/%m/%y %H:%M:%S")
+
     def on_schedule_message(self, message):
-        print("Schedule")
+        print(self.now(), "Schedule")
 
     def on_deactivated_message(self, message):
-        print("Deactivated message")
+        print(self.now(), "Deactivated message")
 
     def on_association_message(self, message):
-        print("Association")
+        print(self.now(), "Association")
 
     def on_alarm_message(self, message):
-        print("Alarm message")
+        print(self.now(), "Alarm message")
 
     def on_station_message(self, message):
-        print("Station message")
+        print(self.now(), "Station message")
 
     def on_tracking_id_message(self, message):
-        print("Tracking ID message")
+        print(self.now(), "Tracking ID message")
 
     def on_train_alert_message(self, message):
-        print("Train alert message")
+        print(self.now(), "Train alert message")
 
     def on_train_order_message(self, message):
-        print("Train order message")
-    
+        print(self.now(), "Train order message")
+
     def on_train_status_message(self, message):
-        print("Train status message")
+        print(self.now(), "Train status message")
 
 # Instantiate the Push Port client.
 client = Client(
@@ -55,5 +58,3 @@ client.connect()
 # Keep the main thread running indefinitely while we receive messages.
 while True:
     time.sleep(1)
-
-
