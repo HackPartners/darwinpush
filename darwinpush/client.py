@@ -1,10 +1,12 @@
 from stomp.connect import StompConnection12
+from stomp.exception import ConnectFailedException
 
 import pyxb.utils.domutils as domutils
 
 import darwinpush.xb.pushport as pp
 
 from darwinpush.parser import Parser
+
 
 import enum
 import multiprocessing
@@ -80,7 +82,7 @@ class Client:
         stomp_user: Your STOMP user name taken from the National Rail Open Data portal.
         stomp_password: Your STOMP password taken from the National Rail Open Data portal.
         stomp_queue: Your STOMP queue name taken from the National Rail Open Data portal.
-        listener: The class object (not an instance of it) for your Listener subclass. 
+        listener: The class object (not an instance of it) for your Listener subclass.
 
     """
 
@@ -89,16 +91,26 @@ class Client:
         self.stomp_password = stomp_password
         self.stomp_queue = stomp_queue
 
+        self.auto_reconnect = True
+
         self.listener_queue = multiprocessing.Queue()
         self.parser_queue = multiprocessing.Queue()
-        self.listener_process = multiprocessing.Process(target=listener_process, args=(listener, self.listener_queue))
-        self.listener_process.start()
-        self.parser_process = multiprocessing.Process(target=parser_process, args=(self.parser_queue, self.listener_queue))
-        self.parser_process.start()
+
+        self.listener_process = multiprocessing.Process(
+            target=listener_process,
+            args=(listener, self.listener_queue))
+
+        self.parser_process = multiprocessing.Process(
+            target=parser_process,
+            args=(self.parser_queue, self.listener_queue))
 
     def connect(self):
         """ Connect to the Darwin Push Port and start receiving messages."""
         self.connected = True
+
+        self.listener_process.start()
+        self.parser_process.start()
+
         self._run()
 
     def _run(self):
@@ -117,7 +129,7 @@ class Client:
 
         # Decode the message and parse it as an XML DOM.
         doc = domutils.StringToDOM(message.decode("utf-8"))
-        
+
         # Parse the record with pyXb.
         m = pp.CreateFromDOM(doc.documentElement)
 
@@ -131,6 +143,51 @@ class Client:
         print(str(error))
         print("+-+-+-+-+-+-+-+-+-+-+-+-+-+-++-+-+-+-+-+-+-+-+-+-+-+-+-+-++-+-+-+-+-+-+-+-+-+-+-+-+-+-++-+-+-+-+-+-+-+-")
 
+    def _on_disconnected(self):
+        print("Attempting to reconnect")
+        if self.auto_reconnect:
+            res = self.reconnect()
+            if res:
+                self.on_reconnected()
+            else:
+                self.on_disconnected()
+        else:
+            self.on_disconnected()
+
+    def on_disconnected(self):
+        """Called when STOMP was disconnected, and a few connection ."""
+        pass
+
+    def on_connected(self):
+        """Called when the connection to STOMP was successful the first time."""
+        pass
+
+    def on_reconnected(self):
+        """Called after a successful reconnection which was triggered by a
+        previous connection problem."""
+        pass
+
+
+    def reconnect(self, retries=3, delay=5):
+        """Attempt to reconnect to STOMP.
+        Args:
+            retries: Number of times to try again. Set <=0 for infinite retries.
+            delay: Delay in seconds between retries.
+        Return:
+            True if everything went fine, false otherwise.
+        """
+        retry = 0
+        while retry < retries or retries <= 0:
+            log.debug("Trying to reconnect, %d..." % retry)
+            try:
+                self.client.connect(self.stomp_user, self.stomp_password, self.stomp_queue, self)
+                log.debug("Reconnection successful at try %d." % retry)
+                return True
+            except ConnectFailedException as e:
+                log.debug("(retry %d) STOMP Conneciton error: %s" % (retry, e))
+                retry += 1
+            time.sleep(delay)
+
     def run(self):
         while 1:
            time.sleep(1)
@@ -139,7 +196,7 @@ class Client:
 class StompClient:
     def connect(self, user, password, queue, callback_object):
         log.debug("StompClient.connect()")
-        
+
         self.cb = callback_object
 
         self.conn = StompConnection12([("datafeeds.nationalrail.co.uk", 61613)], auto_decode=False)
@@ -150,7 +207,7 @@ class StompClient:
 
     def on_error(self, headers, message):
         log.debug("StompClient.onError(headers={}, message={})".format(headers, message))
-        
+
         if has_method(self.cb, "_on_error"):
             self.cb._on_error(headers, message)
 
@@ -190,5 +247,3 @@ class StompClient:
             except Exception as e:
                 log.exception("Exception occurred decompressing the STOMP message.")
                 self.on_local_error(Error(ErrorType.DecompressionError, (headers, message), e))
-
-
