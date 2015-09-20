@@ -1,4 +1,5 @@
-This library is based on [fasteroute/darwinpush](https://github.com/), but we're
+This library is based on
+[fasteroute/darwinpush](https://github.com/fasteroute/darwinpush), but we're
 planning to move fast and break things.
 
 Our goals are to build a strong base for our
