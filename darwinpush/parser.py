@@ -64,7 +64,7 @@ class Parser:
 
             # Process TRAINORDER messages.
             for i in r.trainOrder:
-                log.deug("TRAINORDER message received.")
+                log.debug("TRAINORDER message received.")
                 TrainOrderMessage(i, m, message)
                 self.q_out.put(o)
 
