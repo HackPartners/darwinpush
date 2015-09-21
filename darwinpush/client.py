@@ -14,6 +14,7 @@ import sys
 import threading
 import time
 import zlib
+import signal
 
 import logging
 log = logging.getLogger("darwinpush")
@@ -27,13 +28,15 @@ log = logging.getLogger("darwinpush")
 #LOGGER = logging.getLogger('stomp')
 #####
 
-def listener_process(c, q):
-    listener = c(q)
+def listener_process(c, q, quit_event):
+    listener = c(q, quit_event)
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
     listener._run()
 
 
-def parser_process(q_in, q_out):
-    parser = Parser(q_in, q_out)
+def parser_process(q_in, q_out, quit_event):
+    parser = Parser(q_in, q_out, quit_event)
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
     parser.run()
 
 
@@ -93,16 +96,18 @@ class Client:
 
         self.auto_reconnect = True
 
+        self._quit_event = multiprocessing.Event()
+
         self.listener_queue = multiprocessing.Queue()
         self.parser_queue = multiprocessing.Queue()
 
         self.listener_process = multiprocessing.Process(
             target=listener_process,
-            args=(listener, self.listener_queue))
+            args=(listener, self.listener_queue, self._quit_event))
 
         self.parser_process = multiprocessing.Process(
             target=parser_process,
-            args=(self.parser_queue, self.listener_queue))
+            args=(self.parser_queue, self.listener_queue, self._quit_event))
 
     def connect(self):
         """ Connect to the Darwin Push Port and start receiving messages."""
@@ -113,17 +118,30 @@ class Client:
 
         self._run()
 
+    def disconnect(self):
+        """Disconnect from STOMP and nicely terminate the listener and parser
+        processes."""
+
+        self.connected = False
+
+        # Signal processes to quit
+        self._quit_event.set()
+
+        self.parser_process.join()
+        self.listener_process.join()
+
     def _run(self):
-        self.thread = threading.Thread(target=self._connect)
-        self.thread.daemon = True
-        self.thread.start()
+        self._connect()
+        # self.thread = threading.Thread(target=self._connect)
+        # self.thread.daemon = True
+        # self.thread.start()
 
     def _connect(self):
         self.client = StompClient()
         self.client.connect(self.stomp_user, self.stomp_password, self.stomp_queue, self)
 
-        while self.connected:
-            time.sleep(1)
+        # while self.connected:
+        #     time.sleep(1)
 
     def _on_message(self, headers, message):
 
@@ -154,11 +172,14 @@ class Client:
         else:
             self.on_disconnected()
 
+    def _on_connected(self, headers, body):
+        self.on_connected(headers, body)
+
     def on_disconnected(self):
         """Called when STOMP was disconnected, and a few connection ."""
         pass
 
-    def on_connected(self):
+    def on_connected(self, headers, body):
         """Called when the connection to STOMP was successful the first time."""
         pass
 
@@ -166,7 +187,6 @@ class Client:
         """Called after a successful reconnection which was triggered by a
         previous connection problem."""
         pass
-
 
     def reconnect(self, retries=3, delay=5):
         """Attempt to reconnect to STOMP.

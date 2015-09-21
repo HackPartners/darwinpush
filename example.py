@@ -8,11 +8,11 @@ import time
 
 # Create a listener to process the messages.
 class MyListener(Listener):
-    def __init__(self, q):
+    def __init__(self, q, quit_event):
         # Any setup if needed.
 
         # Finally, call the Super Class initialiser.
-        super().__init__(q)
+        super().__init__(q, quit_event)
 
     def now(self):
         return time.strftime("%d/%m/%y %H:%M:%S")
@@ -44,17 +44,22 @@ class MyListener(Listener):
     def on_train_status_message(self, message):
         print(self.now(), "Train status message")
 
-# Instantiate the Push Port client.
-client = Client(
-    os.environ["STOMP_USER"],
-    os.environ["STOMP_PASS"],
-    os.environ["STOMP_QUEUE"],
-    MyListener
-)
+if __name__ == "__main__":
+    # Instantiate the Push Port client.
+    client = Client(
+        os.environ["STOMP_USER"],
+        os.environ["STOMP_PASS"],
+        os.environ["STOMP_QUEUE"],
+        MyListener
+    )
 
-# Connect the Push Port client.
-client.connect()
-
-# Keep the main thread running indefinitely while we receive messages.
-while True:
-    time.sleep(1)
+    # Connect the Push Port client.
+    client.connect()
+    print("Connected")
+    try:
+        while True:
+            time.sleep(1)
+    except (KeyboardInterrupt, SystemExit):
+        print("Disconnecting client...")
+        client.disconnect()
+        print("Bye")
