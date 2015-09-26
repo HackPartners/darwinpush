@@ -109,14 +109,58 @@ class Client:
             target=parser_process,
             args=(self.parser_queue, self.listener_queue, self._quit_event))
 
-    def connect(self):
-        """ Connect to the Darwin Push Port and start receiving messages."""
-        self.connected = True
-
+    def _start_processes(self):
+        """Start the parser and listener processes."""
         self.listener_process.start()
         self.parser_process.start()
 
-        self._run()
+    def _stop_processes(self):
+        # Signal processes to quit
+        self._quit_event.set()
+
+        # TODO: Send dummy message.
+
+        # Actually quit
+        self.parser_process.join()
+        self.listener_process.join()
+
+
+    def connect(self, downtime=None, stomp=True):
+        """Connect to the Darwin Push Port and start receiving messages.
+        Args:
+            downtime: An int representing the number of seconds of downtime. It
+                    can also be a datetime.timedelta representing the downtime.
+
+                    If the number of seconds is:
+                        <=0, then the snapshot for the day will be downloaded
+                             and applied, and also all the logs.
+
+                        >0,  all the required logs are downloaded. This means no
+                             logs if less than 5 min (300 s) downtime, as Darwin
+                             holds 5 minutes of messages in the queue before it
+                             pushes the log to the FTP server and removes the
+                             messages from the waiting queue.
+
+                    Set downtime to None to disable FTP logs and snapshots.
+
+                    When the files from FTP are parsed, only the messages that
+                    are timestamped by darwin as being sent starting from
+                    `current_time - downtime` will be sent to the listener.
+
+            stomp: Whether to connecto to Darwin via stomp or not. Default is
+                 True. If False, connect() just fetches the relevant files over
+                 FTP, sends them to the listener, and quits; there is no need
+                 to disconnect() when stomp is False.
+        """
+        self._start_processes()
+
+        if downtime is not None:
+            self.ftp_logs(downtime)
+
+        if stomp is True:
+            self._run()
+        else:
+            self._stop_processes()
 
     def disconnect(self):
         """Disconnect from STOMP and nicely terminate the listener and parser
@@ -124,11 +168,10 @@ class Client:
 
         self.connected = False
 
-        # Signal processes to quit
-        self._quit_event.set()
+        self._stop_processes()
 
-        self.parser_process.join()
-        self.listener_process.join()
+    def ftp_logs(downtime):
+        """Parse the FTP logs."""
 
     def _run(self):
         self._connect()
