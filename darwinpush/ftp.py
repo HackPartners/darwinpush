@@ -3,6 +3,7 @@ import datetime
 import re
 
 import pyxb.utils.domutils as domutils
+from darwinpush import Source
 
 import logging
 log = logging.getLogger("ftp")
@@ -106,7 +107,7 @@ def login(ftp, user, passwd):
 def get_logs(ftp, client, date):
     fnames = log_filenames(ftp, date)
     def callback(msg):
-        return client.on_ftp_message(msg, source="FTP/log")
+        return client.on_ftp_message(msg, source=Source.ftp_log)
 
     for f in fnames:
         # TODO filter out duplicate messages, if any

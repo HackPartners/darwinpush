@@ -6,7 +6,7 @@ import pyxb.utils.domutils as domutils
 import darwinpush.xb.pushport as pp
 
 from darwinpush.parser import Parser
-from darwinpush import ftp
+from darwinpush import ftp, Source
 
 import enum
 import multiprocessing
@@ -316,7 +316,7 @@ class StompClient:
             try:
                 decompressed_data = zlib.decompress(message, 16+zlib.MAX_WBITS)
                 try:
-                    self.cb._on_message(headers, decompressed_data, "stomp")
+                    self.cb._on_message(headers, decompressed_data, Source.stomp)
                 except Exception as e:
                     log.exception("Exception occurred parsing DARWIN message: {}.".format(decompressed_data))
                     self.on_local_error(Error(ErrorType.ParseError, decompressed_data, e))
