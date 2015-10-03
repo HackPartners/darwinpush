@@ -6,7 +6,7 @@ import pyxb.utils.domutils as domutils
 import darwinpush.xb.pushport as pp
 
 from darwinpush.parser import Parser
-
+from darwinpush import ftp
 
 import enum
 import multiprocessing
@@ -89,10 +89,14 @@ class Client:
 
     """
 
-    def __init__(self, stomp_user, stomp_password, stomp_queue, listener):
+    def __init__(self, stomp_user, stomp_password, stomp_queue, listener,
+            ftp_user=None, ftp_passwd=None):
         self.stomp_user = stomp_user
         self.stomp_password = stomp_password
         self.stomp_queue = stomp_queue
+
+        self.ftp_user = ftp_user
+        self.ftp_passwd = ftp_passwd
 
         self.auto_reconnect = True
 
@@ -155,7 +159,7 @@ class Client:
         self._start_processes()
 
         if downtime is not None:
-            self.ftp_logs(downtime)
+            self.ftp(downtime)
 
         if stomp is True:
             self._run()
@@ -170,8 +174,9 @@ class Client:
 
         self._stop_processes()
 
-    def ftp_logs(downtime):
+    def ftp(self, downtime):
         """Parse the FTP logs."""
+        ftp.fetchAll(self, downtime, user=self.ftp_user, passwd=self.ftp_passwd)
 
     def _run(self):
         self._connect()
@@ -186,15 +191,21 @@ class Client:
         # while self.connected:
         #     time.sleep(1)
 
-    def _on_message(self, headers, message):
+    def on_ftp_message(self, message, source="FTP"):
+        self._on_message(None, message, source)
+
+    def _on_message(self, headers, message, source=None):
+
+        if type(message) == bytes:
+            message = message.decode("utf-8")
 
         # Decode the message and parse it as an XML DOM.
-        doc = domutils.StringToDOM(message.decode("utf-8"))
+        doc = domutils.StringToDOM(message)
 
         # Parse the record with pyXb.
         m = pp.CreateFromDOM(doc.documentElement)
 
-        self.parser_queue.put((m, message))
+        self.parser_queue.put((m, message, source))
 
     def _on_error(self, headers, message):
         print("Error: %s, %s" % (headers, message))
@@ -303,7 +314,7 @@ class StompClient:
             try:
                 decompressed_data = zlib.decompress(message, 16+zlib.MAX_WBITS)
                 try:
-                    self.cb._on_message(headers, decompressed_data)
+                    self.cb._on_message(headers, decompressed_data, "stomp")
                 except Exception as e:
                     log.exception("Exception occurred parsing DARWIN message: {}.".format(decompressed_data))
                     self.on_local_error(Error(ErrorType.ParseError, decompressed_data, e))

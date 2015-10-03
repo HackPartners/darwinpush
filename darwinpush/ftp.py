@@ -24,7 +24,7 @@ _log_pattern = re.compile(
 class LoginFail(Exception): pass
 
 
-def fetchAll(self, client, downtime, server=ftp_server, user=None, passwd=None):
+def fetchAll(client, downtime, server=ftp_server, user=None, passwd=None):
     """Download all the FTP files required, parse them and pass them to the
     client.
 
@@ -70,7 +70,9 @@ def fetchAll(self, client, downtime, server=ftp_server, user=None, passwd=None):
         return
 
     with ftplib.FTP(server) as ftp:
-        login(server, user, passwd)
+        # Increase max line size. Darwin messages can be large.
+        ftp.maxline = 819100
+        login(ftp, user, passwd)
 
         if snapshot:
             get_snapshot(ftp, client)
@@ -95,6 +97,18 @@ def login(ftp, user, passwd):
         return ftp
 
     raise LoginFail(res)
+
+def get_logs(ftp, client, date):
+    fnames = log_filenames(ftp, date)
+    def callback(msg):
+        return client.on_ftp_message(msg, source="FTP/log")
+
+    for f in fnames:
+        # TODO filter out duplicate messages, if any
+        file_callback(ftp, f, callback)
+
+def get_snapshot(ftp, client):
+    pass
 
 def file_callback(ftp, file, callback):
     """Get a FTP file line by line."""

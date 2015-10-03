@@ -13,10 +13,10 @@ class Parser:
 
     def run(self):
         while not self.quit.is_set():
-            (m, message) = self.q_in.get()
-            self.parse(m, message)
+            (m, message, source) = self.q_in.get()
+            self.parse(m, message, source)
 
-    def parse(self, m, message):
+    def parse(self, m, message, source):
         # We aren't ever expecting the Snapshot Record component to contain anything.
         if m.sR is not None:
             print("o.O.o.O Snapshot record is not none.")
@@ -34,52 +34,52 @@ class Parser:
         for i in r.schedule:
             log.debug("SCHEDULE message received.")
             o = ScheduleXMLMessageFactory.build(i, m, message)
-            self.q_out.put(o)
+            self.q_out.put((o, source))
 
         # Process DEACTIVATED messages.
         for i in r.deactivated:
             log.debug("DEACTIVATED message received.")
             o = DeactivatedMessage(i, m, message)
-            self.q_out.put(o)
+            self.q_out.put((o, source))
 
         # Process ASSOCATION messages.
         for i in r.association:
             log.debug("ASSOCIATION message received.")
             o = AssociationMessage(i, m, message)
-            self.q_out.put(o)
+            self.q_out.put((o, source))
 
         # Process TS messages.
         for i in r.TS:
             log.debug("TS message received.")
             o = TrainStatusXMLMessageFactory.build(i, m, message)
-            self.q_out.put(o)
+            self.q_out.put((o, source))
 
         # Process OW messages.
         for i in r.OW:
             log.debug("OW message received.")
             o = StationMessage(i, m, message)
-            self.q_out.put(o)
+            self.q_out.put((o, source))
 
         # Process TRAINALERT messages.
         for i in r.trainAlert:
             log.debug("TRAINALERT message received.")
             o = TrainAlertMessage(i, m, message)
-            self.q_out.put(o)
+            self.q_out.put((o, source))
 
         # Process TRAINORDER messages.
         for i in r.trainOrder:
             log.debug("TRAINORDER message received.")
             o = TrainOrderMessage(i, m, message)
-            self.q_out.put(o)
+            self.q_out.put((o, source))
 
         # Process TRACKINGID messages.
         for i in r.trackingID:
             log.debug("TRACKINGID message received.")
             o = TrackingIdMessage(i, m, message)
-            self.q_out.put(o)
+            self.q_out.put((o, source))
 
         # Process ALARM messages.
         for i in r.alarm:
             log.debug("ALARM message received.")
             o = AlarmMessage(i, m, message)
-            self.q_out.put(o)
+            self.q_out.put((o, source))

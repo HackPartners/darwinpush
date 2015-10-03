@@ -53,7 +53,7 @@ if __name__ == "__main__":
         MyListener
     )
 
-    # Connect the Push Port client.
+    # Connect the Push Port client. No FTP connection at all!
     client.connect()
     print("Connected")
     try:
