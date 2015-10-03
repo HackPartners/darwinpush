@@ -14,6 +14,11 @@ class Parser:
     def run(self):
         while not self.quit.is_set():
             (m, message, source) = self.q_in.get()
+
+            # check for dummy message that signals quit
+            if m is None and message is None and source is None:
+                break
+
             self.parse(m, message, source)
 
     def parse(self, m, message, source):

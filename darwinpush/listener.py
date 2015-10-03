@@ -11,6 +11,11 @@ class Listener:
 
         while not self.quit.is_set():
             (message, source) = self.queue.get()
+
+            # dummy message that signals quit
+            if message is None and source is None:
+                break
+
             self.route_message(message, source)
 
     def route_message(self, message, source):
