@@ -2,6 +2,8 @@ import ftplib
 import datetime
 import re
 
+import pyxb.utils.domutils as domutils
+
 import logging
 log = logging.getLogger("ftp")
 
@@ -44,6 +46,8 @@ def fetchAll(client, downtime, server=ftp_server, user=None, passwd=None):
                     <=0, then the snapshot for the day will be downloaded
                          and applied, and also all the logs.
 
+                         NOT YET IMPLEMENTED.
+
                     >0,  all the required logs are downloaded. This means no
                          logs if less than 5 min (300 s) downtime, as Darwin
                          holds 5 minutes of messages in the queue before it
@@ -62,10 +66,11 @@ def fetchAll(client, downtime, server=ftp_server, user=None, passwd=None):
     if type(downtime) is not datetime.timedelta:
         downtime = datetime.timedelta(seconds=downtime)
 
-    snapshot = downtime.total_seconds() <= 0 or downtime > snapshot_threshold
+    #snapshot = downtime.total_seconds() <= 0 or downtime > snapshot_threshold
     logs = downtime.total_seconds() <= 0 or downtime > log_threshold
 
-    if not snapshot and not logs:
+    #if not snapshot and not logs:
+    if not logs:
         log.info("No work needed.")
         return
 
@@ -74,8 +79,8 @@ def fetchAll(client, downtime, server=ftp_server, user=None, passwd=None):
         ftp.maxline = 819100
         login(ftp, user, passwd)
 
-        if snapshot:
-            get_snapshot(ftp, client)
+    #    if snapshot:
+    #        get_snapshot(ftp, client)
 
         if logs:
             date = datetime.datetime.now() - downtime
@@ -108,7 +113,9 @@ def get_logs(ftp, client, date):
         file_callback(ftp, f, callback)
 
 def get_snapshot(ftp, client):
+    """Snapshots not supported yet."""
     pass
+
 
 def file_callback(ftp, file, callback):
     """Get a FTP file line by line."""

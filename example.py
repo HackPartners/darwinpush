@@ -17,31 +17,31 @@ class MyListener(Listener):
     def now(self):
         return time.strftime("%d/%m/%y %H:%M:%S")
 
-    def on_schedule_message(self, message):
+    def on_schedule_message(self, message, source):
         print(self.now(), "Schedule")
 
-    def on_deactivated_message(self, message):
+    def on_deactivated_message(self, message, source):
         print(self.now(), "Deactivated message")
 
-    def on_association_message(self, message):
+    def on_association_message(self, message, source):
         print(self.now(), "Association")
 
-    def on_alarm_message(self, message):
+    def on_alarm_message(self, message, source):
         print(self.now(), "Alarm message")
 
-    def on_station_message(self, message):
+    def on_station_message(self, message, source):
         print(self.now(), "Station message")
 
-    def on_tracking_id_message(self, message):
+    def on_tracking_id_message(self, message, source):
         print(self.now(), "Tracking ID message")
 
-    def on_train_alert_message(self, message):
+    def on_train_alert_message(self, message, source):
         print(self.now(), "Train alert message")
 
-    def on_train_order_message(self, message):
+    def on_train_order_message(self, message, source):
         print(self.now(), "Train order message")
 
-    def on_train_status_message(self, message):
+    def on_train_status_message(self, message, source):
         print(self.now(), "Train status message")
 
 if __name__ == "__main__":

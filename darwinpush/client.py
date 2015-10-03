@@ -139,6 +139,8 @@ class Client:
                         <=0, then the snapshot for the day will be downloaded
                              and applied, and also all the logs.
 
+                             NOT YET IMPLEMENTED.
+
                         >0,  all the required logs are downloaded. This means no
                              logs if less than 5 min (300 s) downtime, as Darwin
                              holds 5 minutes of messages in the queue before it
