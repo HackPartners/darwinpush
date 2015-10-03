@@ -6,7 +6,7 @@ import pyxb.utils.domutils as domutils
 import darwinpush.xb.pushport as pp
 
 from darwinpush.parser import Parser
-
+from darwinpush import ftp, Source
 
 import enum
 import multiprocessing
@@ -89,10 +89,14 @@ class Client:
 
     """
 
-    def __init__(self, stomp_user, stomp_password, stomp_queue, listener):
+    def __init__(self, stomp_user, stomp_password, stomp_queue, listener,
+            ftp_user=None, ftp_passwd=None):
         self.stomp_user = stomp_user
         self.stomp_password = stomp_password
         self.stomp_queue = stomp_queue
+
+        self.ftp_user = ftp_user
+        self.ftp_passwd = ftp_passwd
 
         self.auto_reconnect = True
 
@@ -109,14 +113,60 @@ class Client:
             target=parser_process,
             args=(self.parser_queue, self.listener_queue, self._quit_event))
 
-    def connect(self):
-        """ Connect to the Darwin Push Port and start receiving messages."""
-        self.connected = True
-
+    def _start_processes(self):
+        """Start the parser and listener processes."""
         self.listener_process.start()
         self.parser_process.start()
 
-        self._run()
+    def _stop_processes(self):
+        # Signal processes to quit
+        self._quit_event.set()
+
+        # TODO: Send dummy message.
+
+        # Actually quit
+        self.parser_process.join()
+        self.listener_process.join()
+
+
+    def connect(self, downtime=None, stomp=True):
+        """Connect to the Darwin Push Port and start receiving messages.
+        Args:
+            downtime: An int representing the number of seconds of downtime. It
+                    can also be a datetime.timedelta representing the downtime.
+
+                    If the number of seconds is:
+                        <=0, then the snapshot for the day will be downloaded
+                             and applied, and also all the logs.
+
+                             NOT YET IMPLEMENTED.
+
+                        >0,  all the required logs are downloaded. This means no
+                             logs if less than 5 min (300 s) downtime, as Darwin
+                             holds 5 minutes of messages in the queue before it
+                             pushes the log to the FTP server and removes the
+                             messages from the waiting queue.
+
+                    Set downtime to None to disable FTP logs and snapshots.
+
+                    When the files from FTP are parsed, only the messages that
+                    are timestamped by darwin as being sent starting from
+                    `current_time - downtime` will be sent to the listener.
+
+            stomp: Whether to connecto to Darwin via stomp or not. Default is
+                 True. If False, connect() just fetches the relevant files over
+                 FTP, sends them to the listener, and quits; there is no need
+                 to disconnect() when stomp is False.
+        """
+        self._start_processes()
+
+        if downtime is not None:
+            self.ftp(downtime)
+
+        if stomp is True:
+            self._run()
+        else:
+            self._stop_processes()
 
     def disconnect(self):
         """Disconnect from STOMP and nicely terminate the listener and parser
@@ -124,11 +174,11 @@ class Client:
 
         self.connected = False
 
-        # Signal processes to quit
-        self._quit_event.set()
+        self._stop_processes()
 
-        self.parser_process.join()
-        self.listener_process.join()
+    def ftp(self, downtime):
+        """Parse the FTP logs."""
+        ftp.fetchAll(self, downtime, user=self.ftp_user, passwd=self.ftp_passwd)
 
     def _run(self):
         self._connect()
@@ -143,15 +193,21 @@ class Client:
         # while self.connected:
         #     time.sleep(1)
 
-    def _on_message(self, headers, message):
+    def on_ftp_message(self, message, source="FTP"):
+        self._on_message(None, message, source)
+
+    def _on_message(self, headers, message, source=None):
+
+        if type(message) == bytes:
+            message = message.decode("utf-8")
 
         # Decode the message and parse it as an XML DOM.
-        doc = domutils.StringToDOM(message.decode("utf-8"))
+        doc = domutils.StringToDOM(message)
 
         # Parse the record with pyXb.
         m = pp.CreateFromDOM(doc.documentElement)
 
-        self.parser_queue.put((m, message))
+        self.parser_queue.put((m, message, source))
 
     def _on_error(self, headers, message):
         print("Error: %s, %s" % (headers, message))
@@ -260,7 +316,7 @@ class StompClient:
             try:
                 decompressed_data = zlib.decompress(message, 16+zlib.MAX_WBITS)
                 try:
-                    self.cb._on_message(headers, decompressed_data)
+                    self.cb._on_message(headers, decompressed_data, Source.stomp)
                 except Exception as e:
                     log.exception("Exception occurred parsing DARWIN message: {}.".format(decompressed_data))
                     self.on_local_error(Error(ErrorType.ParseError, decompressed_data, e))

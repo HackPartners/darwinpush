@@ -18,31 +18,31 @@ class MyListener(Listener):
         return time.strftime("%d/%m/%y %H:%M:%S")
 
     def on_schedule_message(self, message, source):
-        print(self.now(), "Schedule")
+        print(self.now(), source, "Schedule")
 
     def on_deactivated_message(self, message, source):
-        print(self.now(), "Deactivated message")
+        print(self.now(), source, "Deactivated message")
 
     def on_association_message(self, message, source):
-        print(self.now(), "Association")
+        print(self.now(), source, "Association")
 
     def on_alarm_message(self, message, source):
-        print(self.now(), "Alarm message")
+        print(self.now(), source, "Alarm message")
 
     def on_station_message(self, message, source):
-        print(self.now(), "Station message")
+        print(self.now(), source, "Station message")
 
     def on_tracking_id_message(self, message, source):
-        print(self.now(), "Tracking ID message")
+        print(self.now(), source, "Tracking ID message")
 
     def on_train_alert_message(self, message, source):
-        print(self.now(), "Train alert message")
+        print(self.now(), source, "Train alert message")
 
     def on_train_order_message(self, message, source):
-        print(self.now(), "Train order message")
+        print(self.now(), source, "Train order message")
 
     def on_train_status_message(self, message, source):
-        print(self.now(), "Train status message")
+        print(self.now(), source, "Train status message")
 
 if __name__ == "__main__":
     # Instantiate the Push Port client.
@@ -50,16 +50,13 @@ if __name__ == "__main__":
         os.environ["STOMP_USER"],
         os.environ["STOMP_PASS"],
         os.environ["STOMP_QUEUE"],
-        MyListener
+        MyListener,
+        ftp_user=os.environ["FTP_USER"],
+        ftp_passwd=os.environ["FTP_PASSWD"]
     )
 
-    # Connect the Push Port client. No FTP connection at all!
-    client.connect()
-    print("Connected")
-    try:
-        while True:
-            time.sleep(1)
-    except (KeyboardInterrupt, SystemExit):
-        print("Disconnecting client...")
-        client.disconnect()
-        print("Bye")
+    # Do not connect to stomp, just download and parse the logs from FTP for
+    # the last `downtime` seconds and quit.
+    client.connect(downtime=600, stomp=False)
+    print("All done. Bye :)")
+    client.disconnect()
