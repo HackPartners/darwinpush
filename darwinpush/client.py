@@ -122,10 +122,15 @@ class Client:
         # Signal processes to quit
         self._quit_event.set()
 
-        # TODO: Send dummy message.
-
-        # Actually quit
+        # Parser process: dummy message and quit
+        self.parser_queue.put((None, None, None))
+        print ("Sent dummy parser message")
         self.parser_process.join()
+
+        # Listener process: dummy message and quit
+        self.listener_queue.put((None, None))
+        print ("Sent dummy listener message")
+
         self.listener_process.join()
 
 
