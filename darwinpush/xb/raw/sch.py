@@ -302,7 +302,7 @@ class OR (pyxb.binding.basis.complexTypeDefinition):
 
     
     # Attribute wtd uses Python identifier wtd
-    __wtd = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, 'wtd'), 'wtd', '__httpwww_thalesgroup_comrttiPushPortSchedulesv1_OR_wtd', _ImportedBinding_darwinpush_xb_ct.WTimeType, required=True)
+    __wtd = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, 'wtd'), 'wtd', '__httpwww_thalesgroup_comrttiPushPortSchedulesv1_OR_wtd', _ImportedBinding_darwinpush_xb_ct.WTimeType)
     __wtd._DeclarationLocation = pyxb.utils.utility.Location('/home/gberg/code/src/fstr/darwinpush/xsd/rttiPPTSchedules_v1.xsd', 127, 2)
     __wtd._UseLocation = pyxb.utils.utility.Location('/home/gberg/code/src/fstr/darwinpush/xsd/rttiPPTSchedules_v1.xsd', 127, 2)
     
@@ -386,7 +386,7 @@ class OPOR (pyxb.binding.basis.complexTypeDefinition):
 
     
     # Attribute wtd uses Python identifier wtd
-    __wtd = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, 'wtd'), 'wtd', '__httpwww_thalesgroup_comrttiPushPortSchedulesv1_OPOR_wtd', _ImportedBinding_darwinpush_xb_ct.WTimeType, required=True)
+    __wtd = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, 'wtd'), 'wtd', '__httpwww_thalesgroup_comrttiPushPortSchedulesv1_OPOR_wtd', _ImportedBinding_darwinpush_xb_ct.WTimeType)
     __wtd._DeclarationLocation = pyxb.utils.utility.Location('/home/gberg/code/src/fstr/darwinpush/xsd/rttiPPTSchedules_v1.xsd', 148, 2)
     __wtd._UseLocation = pyxb.utils.utility.Location('/home/gberg/code/src/fstr/darwinpush/xsd/rttiPPTSchedules_v1.xsd', 148, 2)
     
@@ -467,7 +467,7 @@ class IP (pyxb.binding.basis.complexTypeDefinition):
 
     
     # Attribute wta uses Python identifier wta
-    __wta = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, 'wta'), 'wta', '__httpwww_thalesgroup_comrttiPushPortSchedulesv1_IP_wta', _ImportedBinding_darwinpush_xb_ct.WTimeType, required=True)
+    __wta = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, 'wta'), 'wta', '__httpwww_thalesgroup_comrttiPushPortSchedulesv1_IP_wta', _ImportedBinding_darwinpush_xb_ct.WTimeType)
     __wta._DeclarationLocation = pyxb.utils.utility.Location('/home/gberg/code/src/fstr/darwinpush/xsd/rttiPPTSchedules_v1.xsd', 160, 2)
     __wta._UseLocation = pyxb.utils.utility.Location('/home/gberg/code/src/fstr/darwinpush/xsd/rttiPPTSchedules_v1.xsd', 160, 2)
     
@@ -475,7 +475,7 @@ class IP (pyxb.binding.basis.complexTypeDefinition):
 
     
     # Attribute wtd uses Python identifier wtd
-    __wtd = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, 'wtd'), 'wtd', '__httpwww_thalesgroup_comrttiPushPortSchedulesv1_IP_wtd', _ImportedBinding_darwinpush_xb_ct.WTimeType, required=True)
+    __wtd = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, 'wtd'), 'wtd', '__httpwww_thalesgroup_comrttiPushPortSchedulesv1_IP_wtd', _ImportedBinding_darwinpush_xb_ct.WTimeType)
     __wtd._DeclarationLocation = pyxb.utils.utility.Location('/home/gberg/code/src/fstr/darwinpush/xsd/rttiPPTSchedules_v1.xsd', 165, 2)
     __wtd._UseLocation = pyxb.utils.utility.Location('/home/gberg/code/src/fstr/darwinpush/xsd/rttiPPTSchedules_v1.xsd', 165, 2)
     
@@ -560,7 +560,7 @@ class OPIP (pyxb.binding.basis.complexTypeDefinition):
 
     
     # Attribute wta uses Python identifier wta
-    __wta = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, 'wta'), 'wta', '__httpwww_thalesgroup_comrttiPushPortSchedulesv1_OPIP_wta', _ImportedBinding_darwinpush_xb_ct.WTimeType, required=True)
+    __wta = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, 'wta'), 'wta', '__httpwww_thalesgroup_comrttiPushPortSchedulesv1_OPIP_wta', _ImportedBinding_darwinpush_xb_ct.WTimeType)
     __wta._DeclarationLocation = pyxb.utils.utility.Location('/home/gberg/code/src/fstr/darwinpush/xsd/rttiPPTSchedules_v1.xsd', 186, 2)
     __wta._UseLocation = pyxb.utils.utility.Location('/home/gberg/code/src/fstr/darwinpush/xsd/rttiPPTSchedules_v1.xsd', 186, 2)
     
@@ -568,7 +568,7 @@ class OPIP (pyxb.binding.basis.complexTypeDefinition):
 
     
     # Attribute wtd uses Python identifier wtd
-    __wtd = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, 'wtd'), 'wtd', '__httpwww_thalesgroup_comrttiPushPortSchedulesv1_OPIP_wtd', _ImportedBinding_darwinpush_xb_ct.WTimeType, required=True)
+    __wtd = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, 'wtd'), 'wtd', '__httpwww_thalesgroup_comrttiPushPortSchedulesv1_OPIP_wtd', _ImportedBinding_darwinpush_xb_ct.WTimeType)
     __wtd._DeclarationLocation = pyxb.utils.utility.Location('/home/gberg/code/src/fstr/darwinpush/xsd/rttiPPTSchedules_v1.xsd', 191, 2)
     __wtd._UseLocation = pyxb.utils.utility.Location('/home/gberg/code/src/fstr/darwinpush/xsd/rttiPPTSchedules_v1.xsd', 191, 2)
     
@@ -642,7 +642,7 @@ class PP (pyxb.binding.basis.complexTypeDefinition):
 
     
     # Attribute wtp uses Python identifier wtp
-    __wtp = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, 'wtp'), 'wtp', '__httpwww_thalesgroup_comrttiPushPortSchedulesv1_PP_wtp', _ImportedBinding_darwinpush_xb_ct.WTimeType, required=True)
+    __wtp = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, 'wtp'), 'wtp', '__httpwww_thalesgroup_comrttiPushPortSchedulesv1_PP_wtp', _ImportedBinding_darwinpush_xb_ct.WTimeType)
     __wtp._DeclarationLocation = pyxb.utils.utility.Location('/home/gberg/code/src/fstr/darwinpush/xsd/rttiPPTSchedules_v1.xsd', 207, 2)
     __wtp._UseLocation = pyxb.utils.utility.Location('/home/gberg/code/src/fstr/darwinpush/xsd/rttiPPTSchedules_v1.xsd', 207, 2)
     
@@ -731,7 +731,7 @@ class DT (pyxb.binding.basis.complexTypeDefinition):
 
     
     # Attribute wta uses Python identifier wta
-    __wta = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, 'wta'), 'wta', '__httpwww_thalesgroup_comrttiPushPortSchedulesv1_DT_wta', _ImportedBinding_darwinpush_xb_ct.WTimeType, required=True)
+    __wta = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, 'wta'), 'wta', '__httpwww_thalesgroup_comrttiPushPortSchedulesv1_DT_wta', _ImportedBinding_darwinpush_xb_ct.WTimeType)
     __wta._DeclarationLocation = pyxb.utils.utility.Location('/home/gberg/code/src/fstr/darwinpush/xsd/rttiPPTSchedules_v1.xsd', 224, 2)
     __wta._UseLocation = pyxb.utils.utility.Location('/home/gberg/code/src/fstr/darwinpush/xsd/rttiPPTSchedules_v1.xsd', 224, 2)
     
@@ -815,7 +815,7 @@ class OPDT (pyxb.binding.basis.complexTypeDefinition):
 
     
     # Attribute wta uses Python identifier wta
-    __wta = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, 'wta'), 'wta', '__httpwww_thalesgroup_comrttiPushPortSchedulesv1_OPDT_wta', _ImportedBinding_darwinpush_xb_ct.WTimeType, required=True)
+    __wta = pyxb.binding.content.AttributeUse(pyxb.namespace.ExpandedName(None, 'wta'), 'wta', '__httpwww_thalesgroup_comrttiPushPortSchedulesv1_OPDT_wta', _ImportedBinding_darwinpush_xb_ct.WTimeType)
     __wta._DeclarationLocation = pyxb.utils.utility.Location('/home/gberg/code/src/fstr/darwinpush/xsd/rttiPPTSchedules_v1.xsd', 245, 2)
     __wta._UseLocation = pyxb.utils.utility.Location('/home/gberg/code/src/fstr/darwinpush/xsd/rttiPPTSchedules_v1.xsd', 245, 2)
     
