@@ -80,7 +80,9 @@ class ScheduleXMLMessageFactory:
 
             m.all_points.append(p)
 
+        t = None
         first_point = m.all_points[0]
+        
         if first_point.raw_working_arrival_time is not None:
             t = first_point.raw_working_arrival_time
         elif first_point.raw_working_pass_time is not None:
@@ -219,7 +221,9 @@ class ScheduleXMLMessageFactory:
         elif l.raw_working_arrival_time is not None:
             return l.raw_working_arrival_time
         else:
-            raise Exception()
+            # TODO: Add LOG to report exception instead of crashing
+            # raise Exception()
+            pass
 
 
 f = ScheduleXMLMessageFactory
