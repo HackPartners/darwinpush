@@ -88,15 +88,18 @@ class ScheduleXMLMessageFactory:
         elif first_point.raw_working_departure_time is not None:
             t = first_point.raw_working_departure_time
         else:
-            raise Exception()
+            # TODO: Add LOG to report exception instead of crashing
+            # raise Exception()
+            pass
 
-        tz = timezone_for_date_and_time(m.start_date, t)
+        if t:
+            tz = timezone_for_date_and_time(m.start_date, t)
 
-        day_incrementor = 0
-        o = None
-        for p in m.all_points:
-            day_incrementor = f.build_times(day_incrementor, o, p, m.start_date, tz)
-            o = p
+            day_incrementor = 0
+            o = None
+            for p in m.all_points:
+                day_incrementor = f.build_times(day_incrementor, o, p, m.start_date, tz)
+                o = p
 
         m._raw = raw
         m._containing_message = containing_message
