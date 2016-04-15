@@ -47,7 +47,7 @@ class ErrorType(enum.Enum):
 
 
 class Error:
-    def __init__(self, error_type, message, exception):
+    def __init__(self, error_type, payload, exception):
         self._error_type = error_type
         self._payload = payload
         self._exception = exception
